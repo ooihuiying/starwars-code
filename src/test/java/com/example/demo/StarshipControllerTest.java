@@ -90,11 +90,6 @@ class StarshipControllerTest {
                 "/information");
 
         StarshipController spyController = spy(starshipController);
-        StarshipInformation info = StarshipInformation
-                .builder()
-                .starship(Starship.builder().starshipClass("class").model("model").name("name").build())
-                .crewCount("2")
-                .build();
 
         doThrow(new IOException("Error!!")).when(spyController).getStarship();
         final ResponseEntity<Response> response = spyController.getStarshipInformation();
