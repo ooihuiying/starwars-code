@@ -81,6 +81,29 @@ class StarshipControllerTest {
         assertEquals(response.getBody().getStarship(), null);
     }
 
+    @Test
+    void testGetStarshipInformation_requestFailure() throws IOException {
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setServerName("www.something.com");
+        request.setMethod("GET");
+        request.setRequestURI(
+                "/information");
+
+        StarshipController spyController = spy(starshipController);
+        StarshipInformation info = StarshipInformation
+                .builder()
+                .starship(Starship.builder().starshipClass("class").model("model").name("name").build())
+                .crewCount("2")
+                .build();
+
+        doThrow(new IOException("Error!!")).when(spyController).getStarship();
+        final ResponseEntity<Response> response = spyController.getStarshipInformation();
+        assertEquals(response.getStatusCode(), HttpStatus.INTERNAL_SERVER_ERROR);
+        assertEquals(response.getBody().getCrew(), "0");
+        assertEquals(response.getBody().getIsLeiaOnPlanet(), "false");
+        assertEquals(response.getBody().getStarship(), null);
+    }
+
 
     @Test
     void testIsLeiaOnAlderaan() throws IOException {

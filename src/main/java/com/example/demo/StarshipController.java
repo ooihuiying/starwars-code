@@ -25,13 +25,20 @@ public class StarshipController {
     }
 
     @GetMapping
-    public ResponseEntity<Response> getStarshipInformation() throws IOException {
-        StarshipInformation starship = getStarship();
-        boolean isLeiaOnPlanet = isLeiaOnAlderaan();
+    public ResponseEntity<Response> getStarshipInformation() {
+        try {
+            StarshipInformation starship = getStarship();
+            boolean isLeiaOnPlanet = isLeiaOnAlderaan();
 
-        return ResponseEntity.ok().body(
-                Response.builder().starship(starship.getStarship()).crew(starship.getCrewCount()).isLeiaOnPlanet(String.valueOf(isLeiaOnPlanet)).build()
-        );
+            return ResponseEntity.ok().body(
+                    Response.builder().starship(starship.getStarship()).crew(starship.getCrewCount()).isLeiaOnPlanet(String.valueOf(isLeiaOnPlanet)).build()
+            );
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().body(
+                    Response.builder().starship(null).crew("0").isLeiaOnPlanet(String.valueOf(false)).build()
+            );
+        }
+
     }
 
     protected StarshipInformation getStarship() throws IOException {
