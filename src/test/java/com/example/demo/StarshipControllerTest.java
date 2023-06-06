@@ -90,6 +90,11 @@ class StarshipControllerTest {
                 "/information");
 
         StarshipController spyController = spy(starshipController);
+        StarshipInformation info = StarshipInformation
+                .builder()
+                .starship(Starship.builder().starshipClass("class").model("model").name("name").build())
+                .crewCount("2")
+                .build();
 
         doThrow(new IOException("Error!!")).when(spyController).getStarship();
         final ResponseEntity<Response> response = spyController.getStarshipInformation();
@@ -98,7 +103,28 @@ class StarshipControllerTest {
         assertEquals(response.getBody().getIsLeiaOnPlanet(), "false");
         assertEquals(response.getBody().getStarship(), null);
     }
+    @Test
+    void testGetStarship() throws IOException {
+        // Mock the response for the external API call
+        String starshipUrl = "https://swapi.dev/api/starships/?search=Death Star";
+        SwapiStarshipResponse starshipResponse = SwapiStarshipResponse.builder().results(List.of(
+                StarshipResponse.builder().name("Death Star").starshipClass("Star Destroyer").model("Model").crew("2").build())).build();
 
+        when(restTemplate.getForEntity(starshipUrl, Object.class))
+                .thenReturn(new ResponseEntity<>(starshipResponse, HttpStatus.OK));
+        when(objectMapper.writeValueAsString(starshipResponse)).thenReturn("planet");
+        when(objectMapper.readValue("planet", SwapiStarshipResponse.class))
+                .thenReturn(starshipResponse);
+
+        // Perform the test
+        StarshipInformation starshipInformation = starshipController.getStarship();
+
+        // Assertions
+        assertEquals("2", starshipInformation.getCrewCount());
+        assertEquals("Death Star", starshipInformation.getStarship().getName());
+        assertEquals("Star Destroyer", starshipInformation.getStarship().getStarshipClass());
+        assertEquals("Model", starshipInformation.getStarship().getModel());
+    }
 
     @Test
     void testIsLeiaOnAlderaan() throws IOException {
