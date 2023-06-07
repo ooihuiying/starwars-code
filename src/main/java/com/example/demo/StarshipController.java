@@ -42,6 +42,7 @@ public class StarshipController {
     @GetMapping
     public ResponseEntity<Response> getStarshipInformation() {
         try {
+            log.info("Received GET request for starship information");
             StarshipInformation starship = getStarship();
             boolean isLeiaOnPlanet = isLeiaOnAlderaan();
 
@@ -49,6 +50,7 @@ public class StarshipController {
                     Response.builder().starship(starship.getStarship()).crew(starship.getCrewCount()).isLeiaOnPlanet(String.valueOf(isLeiaOnPlanet)).build()
             );
         } catch (Exception e){
+            log.error("Exception in getting response for GET request for starship information %s", e);
             return ResponseEntity.internalServerError().body(
                     Response.builder().build()
             );
@@ -66,9 +68,11 @@ public class StarshipController {
         ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
         SwapiStarshipResponse swapiStarshipResponse = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), SwapiStarshipResponse.class);
         if (swapiStarshipResponse.getResults() == null || swapiStarshipResponse.getResults().size() != ONE_RESULT) {
+            log.warn("No response for SWAPI API to get starship information {}", response.getStatusCode());
             return StarshipInformation.builder().build();
         }
         StarshipResponse starshipResponse = swapiStarshipResponse.getResults().get(FIRST_RESULT_INDEX);
+        log.info("Response for SWAPI API to get starship information is successful {}", starshipResponse);
         return StarshipInformation
                 .builder()
                 .crewCount(starshipResponse.getCrew())
@@ -88,9 +92,10 @@ public class StarshipController {
         ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
         SwapiPersonResponse swapiPersonResponse = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), SwapiPersonResponse.class);
         if (swapiPersonResponse.getResults() == null || swapiPersonResponse.getResults().size() != ONE_RESULT) {
+            log.warn("No response for SWAPI API to get Leia information {}", response.getStatusCode());
             return false;
         }
-
+        log.info("Response for SWAPI API to get Leia information is successful {}", swapiPersonResponse);
         return swapiPersonResponse.getResults().get(FIRST_RESULT_INDEX).getHomeworld().equals(planetUrl);
     }
 
@@ -105,9 +110,10 @@ public class StarshipController {
         ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
         SwapiPlanetResponse swapiResponse = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), SwapiPlanetResponse.class);
         if (swapiResponse.getResults() == null || swapiResponse.getResults().size() != ONE_RESULT) {
+            log.warn("No response for SWAPI API to get Alderaan planet information {}", response.getStatusCode());
             return "";
         }
-
+        log.info("Response for SWAPI API to get Alderaan information is successful {}", swapiResponse);
         return swapiResponse.getResults().get(FIRST_RESULT_INDEX).getUrl();
     }
 }
