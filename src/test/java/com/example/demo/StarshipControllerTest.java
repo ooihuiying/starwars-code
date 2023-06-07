@@ -31,7 +31,11 @@ class StarshipControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        this.starshipController = new StarshipController(this.restTemplate, this.objectMapper);
+        final String baseUrl = "https://swapi.dev/api";
+        final String starshipSearchUrl = baseUrl + "/starships/?search=";
+        final String peopleSearchUrl = baseUrl + "/people/?search=";
+        final String planetSearchUrl = baseUrl + "/planets/?search=";
+        this.starshipController = new StarshipController(this.restTemplate, this.objectMapper, starshipSearchUrl, peopleSearchUrl, planetSearchUrl);
     }
 
     @Test
