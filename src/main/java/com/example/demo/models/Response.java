@@ -10,9 +10,12 @@ import lombok.Getter;
 @Builder
 @Getter
 public class Response {
+    @Builder.Default
     @JsonSerialize(nullsUsing = EmptyStarshipSerializer.class)
-    private Starship starship;
-    private String crew;
+    private Starship starship=null;
+    @Builder.Default
+    private String crew = "0";
     @JsonProperty("isLeiaOnPlanet")
-    private String isLeiaOnPlanet;
+    @Builder.Default
+    private String isLeiaOnPlanet = "false";
 }

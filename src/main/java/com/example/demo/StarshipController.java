@@ -28,6 +28,12 @@ public class StarshipController {
     private final String swapiPeopleSearchUrl;
     private final String swapiPlanetSearchUrl;
 
+    private final Integer ONE_RESULT = 1;
+    private final Integer FIRST_RESULT_INDEX = 0;
+    private final String DEATH_START_CONST = "Death Star";
+    private final String LEIA_NAME_CONST = "Leia Organa";
+    private final String ALDERAAN_PLANET_CONST = "Alderaan";
+
     /**
      * Retrieves starship information and Leia's location.
      *
@@ -44,7 +50,7 @@ public class StarshipController {
             );
         } catch (Exception e){
             return ResponseEntity.internalServerError().body(
-                    Response.builder().starship(null).crew("0").isLeiaOnPlanet(String.valueOf(false)).build()
+                    Response.builder().build()
             );
         }
     }
@@ -56,13 +62,13 @@ public class StarshipController {
      * @throws IOException if there is an error parsing the API response
      */
     protected StarshipInformation getStarship() throws IOException {
-        String url = swapiStarshipSearchUrl + "Death Star";
+        String url = swapiStarshipSearchUrl + DEATH_START_CONST;
         ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
         SwapiStarshipResponse swapiStarshipResponse = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), SwapiStarshipResponse.class);
-        if (swapiStarshipResponse.getResults() == null || swapiStarshipResponse.getResults().size() != 1) {
-            return StarshipInformation.builder().crewCount("0").build();
+        if (swapiStarshipResponse.getResults() == null || swapiStarshipResponse.getResults().size() != ONE_RESULT) {
+            return StarshipInformation.builder().build();
         }
-        StarshipResponse starshipResponse = swapiStarshipResponse.getResults().get(0);
+        StarshipResponse starshipResponse = swapiStarshipResponse.getResults().get(FIRST_RESULT_INDEX);
         return StarshipInformation
                 .builder()
                 .crewCount(starshipResponse.getCrew())
@@ -78,14 +84,14 @@ public class StarshipController {
      */
     protected boolean isLeiaOnAlderaan() throws JsonProcessingException {
         String planetUrl = getPlanetUrl();
-        String url = swapiPeopleSearchUrl + "Leia Organa";
+        String url = swapiPeopleSearchUrl + LEIA_NAME_CONST;
         ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
         SwapiPersonResponse swapiPersonResponse = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), SwapiPersonResponse.class);
-        if (swapiPersonResponse.getResults() == null || swapiPersonResponse.getResults().size() != 1) {
+        if (swapiPersonResponse.getResults() == null || swapiPersonResponse.getResults().size() != ONE_RESULT) {
             return false;
         }
 
-        return swapiPersonResponse.getResults().get(0).getHomeworld().equals(planetUrl);
+        return swapiPersonResponse.getResults().get(FIRST_RESULT_INDEX).getHomeworld().equals(planetUrl);
     }
 
     /**
@@ -95,13 +101,13 @@ public class StarshipController {
      * @throws JsonProcessingException if there is an error parsing the API response
      */
     protected String getPlanetUrl() throws JsonProcessingException {
-        String url = swapiPlanetSearchUrl + "Alderaan";
+        String url = swapiPlanetSearchUrl + ALDERAAN_PLANET_CONST;
         ResponseEntity<Object> response = restTemplate.getForEntity(url, Object.class);
         SwapiPlanetResponse swapiResponse = objectMapper.readValue(objectMapper.writeValueAsString(response.getBody()), SwapiPlanetResponse.class);
-        if (swapiResponse.getResults() == null || swapiResponse.getResults().size() != 1) {
+        if (swapiResponse.getResults() == null || swapiResponse.getResults().size() != ONE_RESULT) {
             return "";
         }
 
-        return swapiResponse.getResults().get(0).getUrl();
+        return swapiResponse.getResults().get(FIRST_RESULT_INDEX).getUrl();
     }
 }

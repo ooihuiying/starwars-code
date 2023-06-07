@@ -11,5 +11,6 @@ import lombok.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StarshipInformation {
     private Starship starship;
-    private String crewCount;
+    @Builder.Default
+    private String crewCount="0";
 }
