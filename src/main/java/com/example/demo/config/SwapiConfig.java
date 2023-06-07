@@ -11,17 +11,17 @@ public class SwapiConfig {
 
     @Bean
     String swapiStarshipSearchUrl() {
-        return swapiUrl + "/starships/?search=";//Death Star
+        return swapiUrl + "/starships/?search=";
     }
 
     @Bean
     String swapiPeopleSearchUrl() {
-        return swapiUrl + "/people/?search="; //Leia Organa
+        return swapiUrl + "/people/?search=";
     }
 
     @Bean
     String swapiPlanetSearchUrl() {
-        return swapiUrl + "/planets/?search="; //Alderaan
+        return swapiUrl + "/planets/?search=";
     }
 
 }
